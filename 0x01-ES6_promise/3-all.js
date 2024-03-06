@@ -4,7 +4,7 @@ export default function handleProfileSignup() {
   Promise.all([uploadPhoto(), createUser()])
     .then((value) => {
       console.log(
-        `${result[0].body} ${result[1].firstName} ${result[1].lastName}`,
+        `${value[0].body} ${value[1].firstName} ${value[1].lastName}`,
       );
     })
     .catch(() => {
