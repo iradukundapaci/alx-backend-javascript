@@ -32,7 +32,7 @@ export default class Pricing {
   }
 
   set currency(currency) {
-    if (currency instanceof Number) {
+    if (currency instanceof Currency) {
       this._currency = currency;
     } else {
       throw new TypeError('currency should be instance of class Currency');
@@ -44,7 +44,10 @@ export default class Pricing {
   }
 
   static convertPrice(amount, conversionRate) {
-    if (!(typeof amount === 'number') || !(conversionRate instanceof Number)) {
+    if (
+      !(typeof amount === 'number') ||
+      !(typeof conversionRate === 'number')
+    ) {
       throw new TypeError('Amount and ConversionRate should be numbers');
     } else {
       return amount * conversionRate;
