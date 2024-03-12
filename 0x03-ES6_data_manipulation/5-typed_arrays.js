@@ -1,8 +1,14 @@
 export default function createInt8TypedArray(length, position, value) {
-  const newArray = new Int8Array(length);
-  newArray[position] = value;
+  if (position < 0 || position >= length) {
+    throw new Error('Position outside range');
+  }
 
-  return new ArrayBuffer(newArray);
+  const buffer = new ArrayBuffer(length);
+  const int8Array = new Int8Array(buffer);
+
+  int8Array[position] = value;
+
+  return new DataView(buffer);
 }
 
 console.log(createInt8TypedArray(10, 2, 89));
