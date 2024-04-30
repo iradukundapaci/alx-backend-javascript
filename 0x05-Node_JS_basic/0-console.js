@@ -2,8 +2,6 @@
  * Display message to stdout
  * @param {message} mesasge to be diplayed
  */
-function displayMessage(message) {
-  process.stdout.write(`${message}\n`);
-}
+const displayMessage = (message) => console.log(message);
 
 module.exports = displayMessage;
