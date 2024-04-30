@@ -6,8 +6,11 @@ function countStudents(path, stream) {
   if (fs.existsSync(path)) {
     const data = fs.readFileSync(path, 'utf8');
     const result = [];
-    data.split('\n').forEach((data) => {
-      result.push(data.split(','));
+    data.split('\n').forEach((line) => {
+      if (line.trim() !== '') {
+        // Check if the line is not empty
+        result.push(line.split(','));
+      }
     });
     result.shift();
     const newis = [];
@@ -38,6 +41,7 @@ function countStudents(path, stream) {
       }
       stream.write(temp[i]);
     }
+    stream.end(); // End the response stream here
   } else {
     throw new Error('Cannot load the database');
   }
@@ -53,15 +57,16 @@ const app = http.createServer((req, res) => {
   if (url === '/') {
     res.write('Hello Holberton School!');
     res.end();
-  }
-  if (url === '/students') {
+  } else if (url === '/students') {
     res.write('This is the list of our students\n');
     try {
       countStudents(argv[2], res);
-      res.end();
     } catch (err) {
       res.end(err.message);
     }
+  } else {
+    res.statusCode = 404;
+    res.end('404 Not Found');
   }
 });
 
