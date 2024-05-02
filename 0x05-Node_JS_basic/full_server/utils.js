@@ -1,44 +1,41 @@
 import fs from 'fs';
 
-export default function readDatabase(filepath) {
-  if (fs.existsSync(filepath)) {
-    return new Promise((resolve) => {
-      fs.readFile(filepath, 'utf8', (err, data) => {
-        if (err) {
-          throw Error('Cannot load the database');
+const readDatabase = (dataPath) => new Promise((resolve, reject) => {
+  if (!dataPath) {
+    reject(new Error('Cannot load the database'));
+  }
+  if (dataPath) {
+    fs.readFile(dataPath, (err, data) => {
+      if (err) {
+        reject(new Error('Cannot load the database'));
+      }
+      if (data) {
+        const fileLines = data
+          .toString('utf-8')
+          .trim()
+          .split('\n');
+        const studentGroups = {};
+        const dbFieldNames = fileLines[0].split(',');
+        const studentPropNames = dbFieldNames
+          .slice(0, dbFieldNames.length - 1);
+
+        for (const line of fileLines.slice(1)) {
+          const studentRecord = line.split(',');
+          const studentPropValues = studentRecord
+            .slice(0, studentRecord.length - 1);
+          const field = studentRecord[studentRecord.length - 1];
+          if (!Object.keys(studentGroups).includes(field)) {
+            studentGroups[field] = [];
+          }
+          const studentEntries = studentPropNames
+            .map((propName, idx) => [propName, studentPropValues[idx]]);
+          studentGroups[field].push(Object.fromEntries(studentEntries));
         }
-        const result = [];
-        data.split('\n').forEach((data) => {
-          result.push(data.split(','));
-        });
-        result.shift();
-        const newis = [];
-        result.forEach((data) => newis.push([data[0], data[3]]));
-        const fields = new Set();
-        newis.forEach((item) => fields.add(item[1]));
-        const final = {};
-        fields.forEach((data) => {
-          final[data] = 0;
-        });
-        newis.forEach((data) => {
-          final[data[1]] += 1;
-        });
-        console.log(
-          `Number of students: ${
-            result.filter((check) => check.length > 3).length
-          }`,
-        );
-        Object.keys(final).forEach((data) => {
-          console.log(
-            `Number of students in ${data}: ${final[data]}. List: ${newis
-              .filter((n) => n[1] === data)
-              .map((n) => n[0])
-              .join(', ')}`,
-          );
-        });
-        resolve(result, final, newis);
-      });
+        resolve(studentGroups);
+      }
     });
   }
-  throw Error('Cannot load the database');
-}
+});
+
+export default readDatabase;
+module.exports = readDatabase;
